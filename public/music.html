@@ -9,7 +9,7 @@
     <script src="jquery-3.7.1.min.js"></script>
 
     <!-- Script oficial del Turnstile -->
-    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" defer></script>
 </head>
 
 <body>
@@ -59,7 +59,7 @@ document.addEventListener("DOMContentLoaded", function() {
     $("#enviarBtn").on("click", async function() {
 
         // Obtener token del CAPTCHA
-        let token = turnstile.getResponse("turnstileWidget");
+        let token = turnstile.getResponse();
         if (!token) {
             alert("Completa el captcha.");
             return;
@@ -94,3 +94,4 @@ document.addEventListener("DOMContentLoaded", function() {
 
 </body>
 </html>
+
