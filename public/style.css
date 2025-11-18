@@ -34,7 +34,6 @@ header img {
 .nav-item {
     color: white;
     padding: 12px 25px;
-    display: inline-block;
     background-color: #103689;
     margin: 0 10px;
     transition: background-color 0.3s;
@@ -103,4 +102,5 @@ header img {
 
 .frame {
     color: black;
+
 }
