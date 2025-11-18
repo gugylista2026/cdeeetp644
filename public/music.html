@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/x-icon" href="logo.png">
+    <title>Centro de Estudiantes</title>
+    <link href="style.css" rel="stylesheet" type="text/css">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+</head>
+
+<body>
+    <header>
+        <img src="centro de.png">
+        <div class="main-nav">
+            <a href="#" class="nav-item">Link 1</a>
+            <a href="#" class="nav-item">Link 2</a>
+            <a href="#" class="nav-item">Link 3</a>
+            <a href="#" class="nav-item">Link 4</a>
+            <a href="#" class="nav-item">Link 4</a>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="center-content">
+            <div class="box">
+                <div class="page-title">
+                    Pedí una canción!
+                    <h3>Recorda que este formato es anónimo</h3>
+
+                    <div class="noticia">
+                        <textarea id="cancion" style="resize: none; margin-left: 20px; margin-right: 10px; width: 100%;" rows="2" maxlength="50" placeholder="Ejemplo: El Negro Tecla – Ahi Ahi" required></textarea>
+                    </div>
+
+                    <div class="cf-turnstile"
+                        data-sitekey="0x4AAAAAACBfq2zltZ7GsLjN"
+                        data-theme="auto"
+                        id="turnstileWidget">
+                    </div>
+
+                    <div class="noticia">
+                        <button id="enviarBtn" type="button" style="margin-left: 20px; margin-right: 20px; margin-top: 10px; width: 100%;">Enviar</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+<script>
+$("#enviarBtn").on("click", async function() {
+    let token = turnstile.getResponse("turnstileWidget");
+    if (!token) return alert("Completa el captcha.");
+
+    let cancion = $("#cancion").val().trim();
+    if (cancion === "") return alert("Escribe una canción.");
+
+    let ahora = new Date().toLocaleString("es-AR");
+
+    const resp = await fetch("/submit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ cancion, token, hora: ahora })
+    });
+
+    const data = await resp.json();
+    if (!data.ok) return alert("Captcha inválido o error.");
+
+    $("#cancion").val("");
+    turnstile.reset("turnstileWidget");
+    alert("Pedido enviado!");
+});
+</script>
+
+</body>
+</html>
