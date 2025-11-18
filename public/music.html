@@ -8,6 +8,7 @@
     <link href="style.css" rel="stylesheet" type="text/css">
     <script src="jquery-3.7.1.min.js"></script>
 
+    <!-- Script oficial del Turnstile -->
     <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 </head>
 
@@ -15,7 +16,7 @@
     <header>
         <img src="centro de.png">
         <div class="main-nav">
-            <a href="#" class="nav-item">Link 1</a>
+            <a href="music.html" class="nav-item">Link 1</a>
             <a href="#" class="nav-item">Link 2</a>
             <a href="#" class="nav-item">Link 3</a>
             <a href="#" class="nav-item">Link 4</a>
@@ -34,6 +35,7 @@
                         <textarea id="cancion" style="resize: none; margin-left: 20px; margin-right: 10px; width: 100%;" rows="2" maxlength="50" placeholder="Ejemplo: El Negro Tecla – Ahi Ahi" required></textarea>
                     </div>
 
+                    <!-- CAPTCHA REAL -->
                     <div class="cf-turnstile"
                         data-sitekey="0x4AAAAAACBfq2zltZ7GsLjN"
                         data-theme="auto"
@@ -51,30 +53,44 @@
 
 
 <script>
-$("#enviarBtn").on("click", async function() {
-    let token = turnstile.getResponse("turnstileWidget");
-    if (!token) return alert("Completa el captcha.");
+// Esperamos a que Turnstile cargue
+document.addEventListener("DOMContentLoaded", function() {
 
-    let cancion = $("#cancion").val().trim();
-    if (cancion === "") return alert("Escribe una canción.");
+    $("#enviarBtn").on("click", async function() {
 
-    let ahora = new Date().toLocaleString("es-AR");
+        // Obtener token del CAPTCHA
+        let token = turnstile.getResponse("turnstileWidget");
+        if (!token) {
+            alert("Completa el captcha.");
+            return;
+        }
 
-    const resp = await fetch("/submit", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ cancion, token, hora: ahora })
+        let cancion = $("#cancion").val().trim();
+        if (cancion === "") return alert("Escribe una canción.");
+
+        let ahora = new Date().toLocaleString("es-AR");
+
+        // Enviar a Cloudflare Function /submit
+        const resp = await fetch("/submit", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ cancion, token, hora: ahora })
+        });
+
+        const data = await resp.json();
+        
+        if (!data.ok) {
+            alert("Captcha inválido o error.");
+            return;
+        }
+
+        $("#cancion").val("");
+        turnstile.reset("turnstileWidget");
+        alert("Pedido enviado!");
     });
 
-    const data = await resp.json();
-    if (!data.ok) return alert("Captcha inválido o error.");
-
-    $("#cancion").val("");
-    turnstile.reset("turnstileWidget");
-    alert("Pedido enviado!");
 });
 </script>
 
 </body>
 </html>
-
