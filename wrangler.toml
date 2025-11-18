@@ -1,6 +1,0 @@
-name = "captcha-project"
-compatibility_date = "2025-01-01"
-
-[vars]
-TURNSTILE_SECRET = "0x4AAAAAACBfqxdVMwitiwO5fbFfaT7sgSU"
-WEBHOOK_URL = "https://discord.com/api/webhooks/1440100190970450072/qIyTnj-Otbmargs6wd7J_Mh5pJ36znwEWi0hN9sR3YcD92w0Q4_Ia3IW8OKFxY1g-M6T"
