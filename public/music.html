@@ -75,7 +75,12 @@ document.addEventListener("DOMContentLoaded", function() {
         const resp = await fetch("/submit", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ cancion, token, hora: ahora })
+            body: JSON.stringify({
+                cancion,
+                token,
+                hora: ahora,
+                tipo: "musica"   // ← AHORA ENVÍA EL TIPO CORRECTO
+            })
         });
 
         const data = await resp.json();
@@ -94,6 +99,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 </body>
 </html>
+
 
 
 
