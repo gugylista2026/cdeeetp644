@@ -1,4 +1,4 @@
-// Habilita GET para probar la ruta desde el navegador
+// Habilita GET para probar desde el navegador
 export async function onRequestGet() {
   return new Response(
     JSON.stringify({ error: "Usá POST para enviar datos" }),
@@ -14,10 +14,17 @@ export async function onRequestPost(context) {
   const { request, env } = context;
 
   const form = await request.json();
-  const { cancion, token, hora } = form;
+  const { cancion, token, hora, tipo } = form;
 
   if (!token) {
     return new Response(JSON.stringify({ error: "Falta token" }), {
+      status: 400,
+      headers: { "Content-Type": "application/json" }
+    });
+  }
+
+  if (!tipo) {
+    return new Response(JSON.stringify({ error: "Falta tipo de mensaje" }), {
       status: 400,
       headers: { "Content-Type": "application/json" }
     });
@@ -42,12 +49,31 @@ export async function onRequestPost(context) {
     });
   }
 
-  // Enviar a Discord
-  await fetch(env.WEBHOOK_URL, {
+  // Elegir webhook y título según el tipo
+  let webhook = "";
+  let titulo = "";
+
+  if (tipo === "musica") {
+    webhook = env.M_WEBHOOK_URL;
+    titulo = "🎵 Nuevo pedido de música";
+  } 
+  else if (tipo === "buzon") {
+    webhook = env.B_WEBHOOK_URL;
+    titulo = "📬 Nuevo mensaje en el buzón";
+  } 
+  else {
+    return new Response(JSON.stringify({ error: "Tipo inválido" }), {
+      status: 400,
+      headers: { "Content-Type": "application/json" }
+    });
+  }
+
+  // Enviar al webhook correspondiente
+  await fetch(webhook, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      content: `@everyone - 🎵 Nuevo pedido: ${cancion}\n🕒 Hora: ${hora}`
+      content: `@everyone - ${titulo}\n📄 Contenido: ${cancion}\n🕒 Hora: ${hora}`
     })
   });
 
