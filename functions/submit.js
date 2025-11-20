@@ -14,7 +14,7 @@ export async function onRequestPost(context) {
   const { request, env } = context;
 
   const form = await request.json();
-  const { cancion, token, hora, tipo } = form;
+  const { contenido, token, hora, tipo } = form;
 
   if (!token) {
     return new Response(JSON.stringify({ error: "Falta token" }), {
@@ -30,6 +30,14 @@ export async function onRequestPost(context) {
     });
   }
 
+  if (!contenido || !hora) {
+    return new Response(JSON.stringify({ error: "Faltan datos (contenido u hora)" }), {
+      status: 400,
+      headers: { "Content-Type": "application/json" }
+    });
+  }
+
+  // Verificación Turnstile
   const verifyUrl = "https://challenges.cloudflare.com/turnstile/v0/siteverify";
 
   const result = await fetch(verifyUrl, {
@@ -49,18 +57,56 @@ export async function onRequestPost(context) {
     });
   }
 
-  // Elegir webhook y título según el tipo
-  let webhook = "";
-  let titulo = "";
+  // ---- EMBEDS PARA DISCORD ----
+  let webhookUrl = null;
+  let payload = null;
 
+  // 🎵 PEDIDOS DE MÚSICA
   if (tipo === "musica") {
-    webhook = env.M_WEBHOOK_URL;
-    titulo = "🎵 Nuevo pedido de música";
-  } 
+    webhookUrl = env.M_WEBHOOK_URL;
+
+    payload = {
+      username: "Pedidos de Música",
+      avatar_url: "https://emoji.discadia.com/emojis/3a4f5e65-d9c4-4f5d-bd31-ac221251e5a2.PNG",
+      embeds: [
+        {
+          title: "🎶 Nuevo pedido de música",
+          description: "Un estudiante ha enviado un nuevo pedido:",
+          color: 0x8A2BE2,
+          fields: [
+            { name: "🎧 Canción solicitada", value: `\`${contenido}\`` },
+            { name: "🕒 Hora", value: hora }
+          ],
+          footer: { text: "Centro de Estudiantes — Música" },
+          timestamp: new Date().toISOString()
+        }
+      ]
+    };
+  }
+
+  // 📬 BUZÓN ANÓNIMO
   else if (tipo === "buzon") {
-    webhook = env.B_WEBHOOK_URL;
-    titulo = "📬 Nuevo mensaje en el buzón";
-  } 
+    webhookUrl = env.B_WEBHOOK_URL;
+
+    payload = {
+      username: "Buzón Anónimo",
+      avatar_url: "https://cdn-icons-png.flaticon.com/512/561/561127.png",
+      embeds: [
+        {
+          title: "📬 Nuevo mensaje en el buzón",
+          description: "Se recibió un mensaje anónimo:",
+          color: 0x00BFFF,
+          fields: [
+            { name: "✉️ Mensaje", value: `\`${contenido}\`` },
+            { name: "🕒 Hora", value: hora }
+          ],
+          footer: { text: "Centro de Estudiantes — Buzón" },
+          timestamp: new Date().toISOString()
+        }
+      ]
+    };
+  }
+
   else {
     return new Response(JSON.stringify({ error: "Tipo inválido" }), {
       status: 400,
@@ -69,12 +115,10 @@ export async function onRequestPost(context) {
   }
 
   // Enviar al webhook correspondiente
-  await fetch(webhook, {
+  await fetch(webhookUrl, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      content: `@everyone - ${titulo}\n📄 Contenido: ${cancion}\n🕒 Hora: ${hora}`
-    })
+    body: JSON.stringify(payload)
   });
 
   return new Response(JSON.stringify({ ok: true }), {
