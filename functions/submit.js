@@ -66,6 +66,7 @@ export async function onRequestPost(context) {
     webhookUrl = env.M_WEBHOOK_URL;
 
     payload = {
+      content: "@everyone",
       username: "Pedidos de Música",
       avatar_url: "https://emoji.discadia.com/emojis/3a4f5e65-d9c4-4f5d-bd31-ac221251e5a2.PNG",
       embeds: [
@@ -89,6 +90,7 @@ export async function onRequestPost(context) {
     webhookUrl = env.B_WEBHOOK_URL;
 
     payload = {
+      content: "@everyone",
       username: "Buzón Anónimo",
       avatar_url: "https://cdn-icons-png.flaticon.com/512/561/561127.png",
       embeds: [
