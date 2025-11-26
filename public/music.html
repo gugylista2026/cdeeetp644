@@ -7,24 +7,70 @@
         <title>Centro de Estudiantes</title>
         <link href = "style.css" rel="stylesheet" type="text/css">
             <script src="jquery-3.7.1.min.js"></script>
-
-        <!-- Script oficial del Turnstile -->
         <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" defer></script>
     </head>
 
     <body>
         <header>
-            <img src="assets/centro de.png"  width="100%" style="margin-bottom: -4px;">
+            <img src="assets/centro de.png" width="100%" style="margin-bottom: -4px;">
             <div class="main-nav">
-                <a href="index.html" class="nav-item">Inicio</a>
-                <a href="music.html" class="nav-item">Musica</a>
-                <a href="#" class="nav-item">Jornadas</a>
-                <a href="#" class="nav-item">Link 3</a>
-                <a href="#" class="nav-item">Nosotros</a>
+                <section class="menu__container">
+        
+        
+                    <ul class="menu__links">
+                        <li class="menu__item">
+                            <a href="index.html" class="nav-item">Inicio</a>
+                        </li>
+                        <li class="menu__item">
+                            <a href="music.html" class="nav-item">Musica</a>
+                        </li>
+        
+                        <li class="menu__item menu__item--show">
+                            <a href="#" class="nav-item">Jornadas<img src="assets/arrow.svg" class="menu__arrow"></a>
+                            <ul class="menu__nesting">
+        
+                                <li class="menu__inside">
+                                    <div id="box"><a href="PELOTAS.HTML" class="menu__link menu__link--inside">Fotos</a>
+                                    </div>
+                                </li>
+        
+                                <li class="menu__inside">
+                                    <div id="box"><a href="zapatillas.html" class="menu__link menu__link--inside">Puntos</a></div>
+                                </li>
+        
+                                <li class="menu__inside">
+                                    <div id="box"><a href="remeras.html"
+                                            class="menu__link menu__link--inside"><img src="img/Remeras.png" width="106px"></a>
+                                    </div>
+                                </li>
+        
+                                <li class="menu__inside">
+                                    <div id="box"><a href="pantalones.html"
+                                            class="menu__link menu__link--inside"><img src="img/Pantalones.png"
+                                                width="135px"></a></div>
+                                </li>
+                            </ul>
+        
+                        </li>
+                        <li class="menu__item">
+                            <a href="#" class="nav-item">Calendario</a>
+                        </li>
+                        <li class="menu__item">
+                            <a href="nostros.html" class="nav-item">Nosotros</a>
+                        </li>
+        
+                        </li>
+        
+                    </ul>
+                </section>
+                
+                
+                
+                
             </div>
             <img src="assets/gradient2.png" width="100%" height="50px">
+            
         </header>
-
     <div class="container">
         <div class="center-content">
             <div class="box">
@@ -36,7 +82,6 @@
                         <textarea id="cancion" style="resize: none; margin-left: 20px; margin-right: 10px; width: 100%;" rows="2" maxlength="50" placeholder="Ejemplo: El Negro Tecla – Ahi Ahi" required></textarea>
                     </div>
 
-                    <!-- CAPTCHA REAL -->
                     <div class="cf-turnstile"
                         data-sitekey="0x4AAAAAACBfq2zltZ7GsLjN"
                         data-theme="auto"
@@ -51,49 +96,33 @@
             </div>
         </div>
     </div>
-
-
-<script>
-// Esperamos a que Turnstile cargue
-document.addEventListener("DOMContentLoaded", function() {
-
+    <script>
     $("#enviarBtn").on("click", async function() {
-
-        // Obtener token del CAPTCHA
         let token = turnstile.getResponse();
-        if (!token) {
-            alert("Completa el captcha.");
-            return;
-        }
+        if (!token) return alert("Completa el captcha.");
 
         let cancion = $("#cancion").val().trim();
         if (cancion === "") return alert("Escribe una canción.");
 
         let ahora = new Date().toLocaleString("es-AR");
 
-        // Enviar a Cloudflare Function /submit
         const resp = await fetch("/submit", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ cancion, token, hora: ahora })
+            body: JSON.stringify({
+                contenido: cancion,
+                token,
+                hora: ahora,
+                tipo: "musica"
+            })
         });
 
         const data = await resp.json();
-        
-        if (!data.ok) {
-            alert("Captcha inválido o error.");
-            return;
-        }
+        if (!data.ok) return alert("Captcha inválido o error.");
 
         $("#cancion").val("");
         turnstile.reset();
     });
-
-});
-</script>
-
-</body>
+    </script>
+    </body>
 </html>
-
-
-

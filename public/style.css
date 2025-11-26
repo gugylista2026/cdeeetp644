@@ -133,7 +133,7 @@ header img {
 }
 .menu__container{
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   width: 90%;
   max-width: 1200px;
@@ -166,6 +166,7 @@ header img {
     display: flex;
     height: 100%;
     align-items: center;
+    gap: 5px;
     transition: background-color 0.6s ease;
 }
 .menu__link:hover{
@@ -174,7 +175,8 @@ header img {
 .menu__arrow {
   transform: rotate(-90deg);
   transition: transform 0.3s ease;
-  display: block;
+  display: inline-block;
+  vertical-align: middle;
   margin-left: 3px;
 }
 .menu__item--active .menu__arrow {
